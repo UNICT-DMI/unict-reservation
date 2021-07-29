@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub struct Config {
     pub cf: String,
     pub password: String,
+    pub driver_url: String,
 }
 
 impl Config {

@@ -5,8 +5,8 @@ use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands};
 
 const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx";
 
-pub async fn init() -> WebDriver {
-    let driver = match WebDriver::new("http://localhost:4444", FirefoxCapabilities::new()).await {
+pub async fn init(driver_url: &String) -> WebDriver {
+    let driver = match WebDriver::new(driver_url, FirefoxCapabilities::new()).await {
         Ok(driver) => driver,
         Err(_) => {
             panic!("Firefox can't be opened");

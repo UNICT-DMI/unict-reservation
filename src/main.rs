@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let bot = Bot::from_env().auto_send();
     let config = Config::from_env().unwrap();
 
-    let driver: WebDriver = browser::init().await;
+    let driver: WebDriver = browser::init(&config.driver_url).await;
     match browser::login(&driver, &config).await {
         Ok(_) => {}
         Err(e) => {
