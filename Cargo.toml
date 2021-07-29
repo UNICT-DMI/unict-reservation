@@ -5,6 +5,7 @@ edition = "2018"
 
 [dependencies]
 teloxide = { version = "0.4", features = ["auto-send", "macros"] }
+
 log = "0.4.8"
 pretty_env_logger = "0.4.0"
 tokio = { version =  "1.3", features = ["rt-multi-thread", "macros"] }
@@ -12,3 +13,5 @@ thirtyfour = "0.26.0"
 
 config = "0.10.1"
 serde = { version = "1.0.104", features = ["derive"] }
+
+tokio-stream = "0.1.6"

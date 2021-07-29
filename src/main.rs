@@ -8,6 +8,8 @@ mod config;
 
 use crate::config::Config;
 
+use tokio_stream::wrappers::UnboundedReceiverStream;
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     teloxide::enable_logging!();
@@ -23,7 +25,23 @@ async fn main() -> Result<(), Box<dyn Error>> {
             panic!("You can't connect: `{}`, credentials are {:?}", e, config);
         }
     };
-    teloxide::commands_repl(bot, "unict-reservation", commands::handler).await;
+
+    Dispatcher::new(bot)
+        .messages_handler(|rx: DispatcherHandlerRx<AutoSend<Bot>, Message>| {
+            UnboundedReceiverStream::new(rx).for_each_concurrent(None, |cx| async move {
+                commands::handler(cx).await.log_on_error().await;
+            })
+        })
+        .callback_queries_handler(|rx: DispatcherHandlerRx<AutoSend<Bot>, CallbackQuery>| {
+            UnboundedReceiverStream::new(rx).for_each_concurrent(None, |cx| async move {
+                let data = &cx.update.data;
+                if let Some(d) = data {
+                    println!("{}", d);
+                }
+            })
+        })
+        .dispatch()
+        .await;
 
     log::info!("Closing bot... Goodbye!");
     Ok(())
