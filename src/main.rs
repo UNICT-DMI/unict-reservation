@@ -1,24 +1,12 @@
 use std::error::Error;
 use teloxide::prelude::*;
-use teloxide::utils::command::BotCommand;
+use thirtyfour::WebDriver;
 
-#[derive(BotCommand)]
-#[command(rename = "lowercase", description = "These commands are supported:")]
-enum Command {
-    #[command(description = "display this text")]
-    Help,
-}
+mod browser;
+mod commands;
+mod config;
 
-async fn handler(
-    cx: UpdateWithCx<AutoSend<Bot>, Message>,
-    command: Command,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
-    match command {
-        Command::Help => cx.answer(Command::descriptions()).await?,
-    };
-
-    Ok(())
-}
+use crate::config::Config;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -26,8 +14,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
     log::info!("Starting bot...");
 
     let bot = Bot::from_env().auto_send();
+    let config = Config::from_env().unwrap();
 
-    teloxide::commands_repl(bot, "unict-reservation", handler).await;
+    let driver: WebDriver = browser::init().await;
+    match browser::login(&driver, &config).await {
+        Ok(_) => {}
+        Err(e) => {
+            panic!("You can't connect: `{}`, credentials are {:?}", e, config);
+        }
+    };
+    teloxide::commands_repl(bot, "unict-reservation", commands::handler).await;
 
+    log::info!("Closing bot... Goodbye!");
     Ok(())
 }
