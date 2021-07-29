@@ -3,6 +3,8 @@ use std::{thread, time};
 use thirtyfour::prelude::{By, WebDriverResult};
 use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands};
 
+const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx";
+
 pub async fn init() -> WebDriver {
     let driver = match WebDriver::new("http://localhost:4444", FirefoxCapabilities::new()).await {
         Ok(driver) => driver,
@@ -15,9 +17,7 @@ pub async fn init() -> WebDriver {
 }
 
 pub async fn login(driver: &WebDriver, credentials: &Config) -> WebDriverResult<()> {
-    driver
-        .get("https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx")
-        .await?;
+    driver.get(LOGIN_URL).await?;
 
     let cf_input = driver
         .find_element(By::Name("ctl01$contents$UserName"))
@@ -36,6 +36,8 @@ pub async fn login(driver: &WebDriver, credentials: &Config) -> WebDriverResult<
         .await?
         .click()
         .await?;
+
+    thread::sleep(time::Duration::from_millis(2000));
 
     Ok(())
 }
