@@ -6,6 +6,7 @@ pub struct Config {
     pub cf: String,
     pub password: String,
     pub driver_url: String,
+    pub username: String,
 }
 
 impl Config {

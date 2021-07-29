@@ -1,3 +1,4 @@
+use crate::config::Config;
 use std::error::Error;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{AutoSend, Bot, Message, UpdateWithCx};
@@ -16,6 +17,17 @@ pub enum Command {
 pub async fn handler(
     cx: UpdateWithCx<AutoSend<Bot>, Message>,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let username = Config::from_env().unwrap().username;
+
+    if let Some(author) = &cx.update.from().unwrap().username {
+        if *author != username {
+            cx.reply_to("You are not allowed to do this action!")
+                .await?;
+
+            return Ok(());
+        }
+    }
+
     let txt = cx.update.text();
     if txt.is_none() {
         return Ok(());
