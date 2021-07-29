@@ -44,5 +44,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await;
 
     log::info!("Closing bot... Goodbye!");
+    driver.quit().await?;
+
     Ok(())
 }
