@@ -6,8 +6,8 @@ use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands};
 pub async fn init() -> WebDriver {
     let driver = match WebDriver::new("http://localhost:4444", FirefoxCapabilities::new()).await {
         Ok(driver) => driver,
-        Err(e) => {
-            panic!(e);
+        Err(_) => {
+            panic!("Firefox can't be opened");
         }
     };
 
