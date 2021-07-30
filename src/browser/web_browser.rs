@@ -4,7 +4,7 @@ use thirtyfour::error::{WebDriverError, WebDriverErrorInfo, WebDriverErrorValue}
 use thirtyfour::prelude::{By, WebDriverResult};
 use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands};
 
-const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx";
+const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx?ReturnUrl=%2fStudenti%2fDefault.aspx";
 
 pub struct Browser {
     driver: Option<WebDriver>,
@@ -33,12 +33,14 @@ impl Browser {
             let cf_input = _d.find_element(By::Name("ctl01$contents$UserName")).await?;
             cf_input.send_keys(&credentials.cf).await?;
 
+            thread::sleep(time::Duration::from_millis(3000));
+
             let psw_input = _d
                 .find_element(By::Name("ctl01$contents$UserPassword"))
                 .await?;
             psw_input.send_keys(&credentials.password).await?;
 
-            thread::sleep(time::Duration::from_millis(1000));
+            thread::sleep(time::Duration::from_millis(3000));
 
             _d.find_element(By::Name("ctl01$contents$LogonButton"))
                 .await?
