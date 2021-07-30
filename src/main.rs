@@ -1,7 +1,5 @@
 use std::error::Error;
 use teloxide::prelude::*;
-use thirtyfour::WebDriver;
-
 mod browser;
 mod commands;
 mod config;
@@ -18,13 +16,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let bot = Bot::from_env().auto_send();
     let config = Config::from_env().unwrap();
 
-    let driver: WebDriver = browser::init(&config.driver_url).await;
-    match browser::login(&driver, &config).await {
-        Ok(_) => {}
-        Err(e) => {
+    unsafe {
+        browser::init(&config.driver_url).await;
+
+        if let Err(e) = browser::login(&config).await {
             panic!("You can't connect: `{}`, credentials are {:?}", e, config);
         }
-    };
+    }
 
     Dispatcher::new(bot)
         .messages_handler(|rx: DispatcherHandlerRx<AutoSend<Bot>, Message>| {
@@ -44,7 +42,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await;
 
     log::info!("Closing bot... Goodbye!");
-    driver.quit().await?;
 
     Ok(())
 }
