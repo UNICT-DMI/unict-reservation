@@ -19,8 +19,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     unsafe {
         browser::init(&config.driver_url).await;
 
-        if let Err(e) = browser::login(&config).await {
-            panic!("You can't connect: `{}`, credentials are {:?}", e, config);
+        match browser::login(&config).await {
+            Ok(_) => {
+                log::info!("Logged in Smartedu");
+            }
+            Err(e) => {
+                panic!("You can't connect: `{}`, credentials are {:?}", e, config);
+            }
         }
     }
 
