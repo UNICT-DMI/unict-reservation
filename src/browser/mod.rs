@@ -22,15 +22,10 @@ pub async unsafe fn login(credentials: &Config) -> WebDriverResult<()> {
 
 pub async unsafe fn get_faculties() -> WebDriverResult<Option<HashMap<String, String>>> {
     if let Some(driver) = &WEB_BROWSER {
-        match driver.faculties().await? {
-            Some(faculties) => {
-                return Ok(Some(faculties));
-            }
-            None => {
-                return Ok(Some(HashMap::<String, String>::new()));
-            }
-        };
+        if let Some(faculties) = driver.faculties().await? {
+            return Ok(Some(faculties));
+        }
     }
 
-    Ok(Some(HashMap::<String, String>::new()))
+    Ok(None)
 }
