@@ -6,14 +6,19 @@ use thirtyfour::error::{WebDriverError, WebDriverErrorInfo, WebDriverErrorValue}
 use thirtyfour::prelude::{By, WebDriverResult};
 use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands};
 
+/// This url is used to make the login
 const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx?ReturnUrl=%2fStudenti%2fDefault.aspx";
+/// This url is used to go to the page where a student can book a room for study
 const ROOMS_URL: &str = "https://studenti.smartedu.unict.it/StudentSpaceReserv?Type=unaTantum";
 
+/// Browser struct
 pub struct Browser {
+    /// The driver for Firefox, it could be `None`
     driver: Option<WebDriver>,
 }
 
 impl Browser {
+    /// Create a new `Browser` with a Firefox driver with a personalized User-Agent
     pub async fn new(driver_url: &String) -> Self {
         let user_agent =
             "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0";
@@ -34,6 +39,7 @@ impl Browser {
     //     Ok(())
     // }
 
+    /// Login on `LOGIN_URL`
     pub async unsafe fn _login(&self, credentials: &Config) -> WebDriverResult<()> {
         if let Some(_d) = &self.driver {
             _d.get(LOGIN_URL).await?;
@@ -57,6 +63,8 @@ impl Browser {
 
             thread::sleep(time::Duration::from_millis(2000));
 
+            // If the current url is the same as `LOGIN_URL` it means the login didn't work, so
+            // returns a "login error"
             if _d.current_url().await? == LOGIN_URL {
                 return Err(WebDriverError::SessionNotCreated(WebDriverErrorInfo {
                     status: 400,
@@ -74,6 +82,8 @@ impl Browser {
         Ok(())
     }
 
+    /// Get all faculties for booking and return an `HashMap<key, value>` when `key` is the
+    /// key for that faculty inside the `select` tag and `value` is just the text of the option.
     pub async fn faculties(&self) -> WebDriverResult<Option<HashMap<String, String>>> {
         if let Some(_d) = &self.driver {
             _d.get(ROOMS_URL).await?;
@@ -106,4 +116,5 @@ impl Browser {
     }
 }
 
+/// The static unsafe variable used to open a web browser
 pub static mut WEB_BROWSER: Option<Browser> = None;

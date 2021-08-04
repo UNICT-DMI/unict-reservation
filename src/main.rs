@@ -17,13 +17,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let config = Config::from_env().unwrap();
 
     unsafe {
+        // Open the browser
         browser::init(&config.driver_url).await;
 
+        // Login using the credentials inside the `config`
         match browser::login(&config).await {
             Ok(_) => {
                 log::info!("Logged in Smartedu");
             }
             Err(e) => {
+                // Using the bot when the user is not logged in, is simply useless.
                 panic!("You can't connect: `{}`, credentials are {:?}", e, config);
             }
         }

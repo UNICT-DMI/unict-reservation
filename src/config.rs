@@ -3,9 +3,13 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
+    /// The ID for every italian person, it's used from Smartedu as username
     pub cf: String,
+    /// The password of Smartedu
     pub password: String,
+    /// Driver url, an example is `http://localhost:4444` for geckodriver
     pub driver_url: String,
+    /// Username of the Telegram user authorized to use the bot
     pub username: String,
 }
 
