@@ -12,12 +12,17 @@ pub struct Browser {
 
 impl Browser {
     pub async fn new(driver_url: &String) -> Self {
+        let user_agent =
+            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0";
+
+        let mut prefs = FirefoxPreferences::new();
+        let _ = prefs.set_user_agent(user_agent.to_string());
+
+        let mut caps = FirefoxCapabilities::new();
+        let _ = caps.set_preferences(prefs);
+
         Self {
-            driver: Some(
-                WebDriver::new(driver_url, FirefoxCapabilities::new())
-                    .await
-                    .unwrap(),
-            ),
+            driver: Some(WebDriver::new(driver_url, caps).await.unwrap()),
         }
     }
 
