@@ -1,3 +1,4 @@
+use crate::browser;
 use crate::config::Config;
 use std::error::Error;
 use teloxide::payloads::SendMessageSetters;
@@ -39,9 +40,27 @@ pub async fn handler(
                 cx.answer(Command::descriptions()).await?;
             }
             Command::Room => {
-                let url_button =
-                    InlineKeyboardButton::callback("hello".to_string(), "hello_call".to_string());
-                let keyboard = InlineKeyboardMarkup::default().append_row(vec![url_button]);
+                let faculties;
+                let mut faculties_array: Vec<Vec<InlineKeyboardButton>> = vec![];
+                unsafe {
+                    faculties = browser::get_faculties().await.unwrap();
+                }
+
+                if let Some(faculties_texts) = faculties {
+                    for (key, value) in faculties_texts {
+                        faculties_array.push(vec![InlineKeyboardButton::callback(
+                            value,
+                            format!("faculty_{}", key),
+                        )]);
+                    }
+                } else {
+                    faculties_array.push(vec![InlineKeyboardButton::callback(
+                        "No such element".to_string(),
+                        "".into(),
+                    )]);
+                }
+
+                let keyboard = InlineKeyboardMarkup::new(faculties_array);
                 cx.answer("Where?").reply_markup(keyboard).await?;
             }
         }
