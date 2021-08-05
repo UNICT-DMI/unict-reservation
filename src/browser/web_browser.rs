@@ -115,6 +115,38 @@ impl Browser {
         Ok(None)
     }
 
+    /// Get all spaces for booking and return an `HashMap<key, value>` when `key` is the
+    /// key for that space inside the `select` tag and `value` is just the text of the option.
+    pub async fn spaces(&self) -> WebDriverResult<Option<HashMap<String, String>>> {
+        if let Some(_d) = &self.driver {
+            thread::sleep(time::Duration::from_millis(1000));
+
+            _d.find_element(By::Css(
+                "span[aria-labelledby='select2-spaceSelector-container']",
+            ))
+            .await?
+            .click()
+            .await?;
+
+            let list_elements = _d
+                .find_elements(By::Css("#select2-spaceSelector-results li"))
+                .await?;
+
+            let mut spaces_ids = HashMap::<String, String>::new();
+
+            for i in list_elements {
+                spaces_ids.insert(
+                    i.get_attribute("data-select2-id").await.unwrap().unwrap(),
+                    i.text().await.unwrap(),
+                );
+            }
+
+            return Ok(Some(spaces_ids));
+        }
+
+        Ok(None)
+    }
+
     /// Select an option from a list of select elements
     pub async fn select_option_from_list(
         &self,

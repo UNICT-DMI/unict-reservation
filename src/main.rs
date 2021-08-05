@@ -44,7 +44,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             UnboundedReceiverStream::new(rx).for_each_concurrent(None, |cx| async move {
                 let data = &cx.update.data;
                 if let Some(text) = data {
-                    callbacks::handler(text).await;
+                    let _ = callbacks::handler(&cx, text).await;
                 }
             })
         })

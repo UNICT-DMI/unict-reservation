@@ -35,6 +35,17 @@ pub async unsafe fn get_faculties() -> WebDriverResult<Option<HashMap<String, St
     Ok(None)
 }
 
+/// Get the spaces (rooms) available to book
+pub async unsafe fn get_spaces() -> WebDriverResult<Option<HashMap<String, String>>> {
+    if let Some(driver) = &WEB_BROWSER {
+        if let Some(spaces) = driver.spaces().await? {
+            return Ok(Some(spaces));
+        }
+    }
+
+    Ok(None)
+}
+
 pub async unsafe fn select_option(
     klass: &str,
     property_name: &str,
