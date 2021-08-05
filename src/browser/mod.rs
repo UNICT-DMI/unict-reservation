@@ -34,3 +34,19 @@ pub async unsafe fn get_faculties() -> WebDriverResult<Option<HashMap<String, St
 
     Ok(None)
 }
+
+pub async unsafe fn select_option(
+    klass: &str,
+    property_name: &str,
+    property_value: &str,
+) -> WebDriverResult<bool> {
+    if let Some(driver) = &WEB_BROWSER {
+        let result = driver
+            .select_option_from_list(klass, property_name, property_value)
+            .await?;
+
+        return Ok(result);
+    }
+
+    Ok(false)
+}

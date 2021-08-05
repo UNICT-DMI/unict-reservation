@@ -114,6 +114,27 @@ impl Browser {
 
         Ok(None)
     }
+
+    /// Select an option from a list of select elements
+    pub async fn select_option_from_list(
+        &self,
+        klass: &str,
+        property_name: &str,
+        property_value: &str,
+    ) -> WebDriverResult<bool> {
+        if let Some(_d) = &self.driver {
+            _d.find_element(By::Css(
+                &format!("li.{}[{}='{}']", klass, property_name, property_value).to_owned()[..],
+            ))
+            .await?
+            .click()
+            .await?;
+
+            return Ok(true);
+        }
+
+        Ok(false)
+    }
 }
 
 /// The static unsafe variable used to open a web browser

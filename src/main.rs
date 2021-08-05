@@ -1,6 +1,7 @@
 use std::error::Error;
 use teloxide::prelude::*;
 mod browser;
+mod callbacks;
 mod commands;
 mod config;
 
@@ -41,8 +42,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .callback_queries_handler(|rx: DispatcherHandlerRx<AutoSend<Bot>, CallbackQuery>| {
             UnboundedReceiverStream::new(rx).for_each_concurrent(None, |cx| async move {
                 let data = &cx.update.data;
-                if let Some(d) = data {
-                    println!("{}", d);
+                if let Some(text) = data {
+                    callbacks::handler(text).await;
                 }
             })
         })
