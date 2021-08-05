@@ -9,7 +9,7 @@ use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands};
 /// This url is used to make the login
 const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx?ReturnUrl=%2fStudenti%2fDefault.aspx";
 /// This url is used to go to the page where a student can book a room for study
-const ROOMS_URL: &str = "https://studenti.smartedu.unict.it/StudentSpaceReserv?Type=unaTantum";
+pub const ROOMS_URL: &str = "https://studenti.smartedu.unict.it/StudentSpaceReserv?Type=unaTantum";
 
 /// Browser struct
 pub struct Browser {
@@ -82,22 +82,35 @@ impl Browser {
         Ok(())
     }
 
-    /// Get all faculties for booking and return an `HashMap<key, value>` when `key` is the
-    /// key for that faculty inside the `select` tag and `value` is just the text of the option.
-    pub async fn faculties(&self) -> WebDriverResult<Option<HashMap<String, String>>> {
+    /// Get all options for booking following the `label` and return an `HashMap<key, value>` when `key` is the
+    /// key for that label inside the `select` tag and `value` is just the text of the option.
+    /// If `url` is specified then go to that page
+    pub async fn get_options(
+        &self,
+        label: &str,
+        url: &str,
+    ) -> WebDriverResult<Option<HashMap<String, String>>> {
         if let Some(_d) = &self.driver {
-            _d.get(ROOMS_URL).await?;
+            if url != "" {
+                _d.get(url).await?;
+            }
             thread::sleep(time::Duration::from_millis(1000));
 
             _d.find_element(By::Css(
-                "span[aria-labelledby='select2-dipartimentoSelector-container']",
+                &format!(
+                    "span[aria-labelledby='select2-{}Selector-container']",
+                    label
+                )
+                .to_owned()[..],
             ))
             .await?
             .click()
             .await?;
 
             let list_elements = _d
-                .find_elements(By::Css("#select2-dipartimentoSelector-results li"))
+                .find_elements(By::Css(
+                    &format!("#select2-{}Selector-results li", label).to_owned()[..],
+                ))
                 .await?;
 
             let mut faculties_ids = HashMap::<String, String>::new();
@@ -110,38 +123,6 @@ impl Browser {
             }
 
             return Ok(Some(faculties_ids));
-        }
-
-        Ok(None)
-    }
-
-    /// Get all spaces for booking and return an `HashMap<key, value>` when `key` is the
-    /// key for that space inside the `select` tag and `value` is just the text of the option.
-    pub async fn spaces(&self) -> WebDriverResult<Option<HashMap<String, String>>> {
-        if let Some(_d) = &self.driver {
-            thread::sleep(time::Duration::from_millis(1000));
-
-            _d.find_element(By::Css(
-                "span[aria-labelledby='select2-spaceSelector-container']",
-            ))
-            .await?
-            .click()
-            .await?;
-
-            let list_elements = _d
-                .find_elements(By::Css("#select2-spaceSelector-results li"))
-                .await?;
-
-            let mut spaces_ids = HashMap::<String, String>::new();
-
-            for i in list_elements {
-                spaces_ids.insert(
-                    i.get_attribute("data-select2-id").await.unwrap().unwrap(),
-                    i.text().await.unwrap(),
-                );
-            }
-
-            return Ok(Some(spaces_ids));
         }
 
         Ok(None)

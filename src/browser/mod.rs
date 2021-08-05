@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use self::web_browser::{Browser, WEB_BROWSER};
+use self::web_browser::{Browser, ROOMS_URL, WEB_BROWSER};
 use crate::Config;
 use thirtyfour::prelude::WebDriverResult;
 
@@ -27,7 +27,7 @@ pub async unsafe fn login(credentials: &Config) -> WebDriverResult<()> {
 /// Get the faculties available for booking a room
 pub async unsafe fn get_faculties() -> WebDriverResult<Option<HashMap<String, String>>> {
     if let Some(driver) = &WEB_BROWSER {
-        if let Some(faculties) = driver.faculties().await? {
+        if let Some(faculties) = driver.get_options("dipartimento", ROOMS_URL).await? {
             return Ok(Some(faculties));
         }
     }
@@ -38,7 +38,7 @@ pub async unsafe fn get_faculties() -> WebDriverResult<Option<HashMap<String, St
 /// Get the spaces (rooms) available to book
 pub async unsafe fn get_spaces() -> WebDriverResult<Option<HashMap<String, String>>> {
     if let Some(driver) = &WEB_BROWSER {
-        if let Some(spaces) = driver.spaces().await? {
+        if let Some(spaces) = driver.get_options("space", "").await? {
             return Ok(Some(spaces));
         }
     }
