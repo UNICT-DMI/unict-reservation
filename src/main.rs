@@ -4,6 +4,7 @@ mod browser;
 mod callbacks;
 mod commands;
 mod config;
+mod keyboard;
 
 use crate::config::Config;
 
