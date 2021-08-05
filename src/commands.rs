@@ -3,7 +3,7 @@ use crate::config::Config;
 use crate::keyboard::make_inline_keyboard;
 use std::error::Error;
 use teloxide::payloads::SendMessageSetters;
-use teloxide::prelude::{AutoSend, Bot, Message, UpdateWithCx};
+use teloxide::prelude::{AutoSend, Bot, GetChatId, Message, UpdateWithCx};
 use teloxide::utils::command::BotCommand;
 
 #[derive(BotCommand)]
@@ -54,7 +54,7 @@ pub async fn handler(
                     faculties = browser::get_faculties().await.unwrap();
                 }
 
-                let keyboard = make_inline_keyboard(&faculties, "faculty").await;
+                let keyboard = make_inline_keyboard(&faculties, "faculty", cx.chat_id()).await;
                 cx.answer("Where?").reply_markup(keyboard).await?;
             }
         }

@@ -5,6 +5,7 @@ use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 pub async fn make_inline_keyboard(
     hashmap: &Option<HashMap<String, String>>,
     callback_type: &str,
+    chat_id: i64,
 ) -> InlineKeyboardMarkup {
     // This is an array of array because the `InlineKeyboardMarkup`
     // considers each array as a row.
@@ -16,7 +17,7 @@ pub async fn make_inline_keyboard(
         for (key, value) in options {
             keyboard_array.push(vec![InlineKeyboardButton::callback(
                 value.clone(),
-                format!("{}_{}", callback_type, key),
+                format!("{}_{}_{}", chat_id, callback_type, key),
             )]);
         }
     } else {
