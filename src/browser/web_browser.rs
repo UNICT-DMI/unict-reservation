@@ -4,7 +4,7 @@ use std::{thread, time};
 use thirtyfour::common::capabilities::firefox::FirefoxPreferences;
 use thirtyfour::error::{WebDriverError, WebDriverErrorInfo, WebDriverErrorValue};
 use thirtyfour::prelude::{By, WebDriverResult};
-use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands};
+use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands, WebElement};
 
 /// This url is used to make the login
 const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx?ReturnUrl=%2fStudenti%2fDefault.aspx";
@@ -147,6 +147,46 @@ impl Browser {
         }
 
         Ok(false)
+    }
+
+    /// Get the timetable of available hours from the driver and returns an hashmap with id->text
+    pub async fn get_timetable(&self) -> WebDriverResult<Option<HashMap<String, String>>> {
+        if let Some(_d) = &self.driver {
+            thread::sleep(time::Duration::from_millis(2000));
+
+            let table_trs = _d
+                .find_elements(By::Css("div[data-select2-id='studyPlan'] table tbody tr"))
+                .await?;
+
+            let mut timetable = HashMap::<String, String>::new();
+
+            for i in table_trs.iter() {
+                let cols: Vec<WebElement> = i.find_elements(By::Css("td")).await?;
+                if cols.len() < 6 {
+                    continue;
+                }
+
+                let col_id = i.find_element(By::Css("th")).await?.text().await.unwrap();
+                let mut text_formatted = cols[0].text().await.unwrap();
+                text_formatted.push_str(
+                    &format!(
+                        ", {} - {}.\n",
+                        cols[1].text().await.unwrap(),
+                        cols[2].text().await.unwrap()
+                    )
+                    .to_owned()[..],
+                );
+
+                text_formatted
+                    .push_str(&format!("Posti: {}", cols[6].text().await.unwrap()).to_owned()[..]);
+
+                timetable.insert(col_id, text_formatted);
+            }
+
+            return Ok(Some(timetable));
+        }
+
+        Ok(None)
     }
 }
 

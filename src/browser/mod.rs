@@ -61,3 +61,14 @@ pub async unsafe fn select_option(
 
     Ok(false)
 }
+
+/// Get the timetable of available rooms
+pub async unsafe fn get_timetable() -> WebDriverResult<Option<HashMap<String, String>>> {
+    if let Some(driver) = &WEB_BROWSER {
+        if let Some(timetable) = driver.get_timetable().await? {
+            return Ok(Some(timetable));
+        }
+    }
+
+    Ok(None)
+}
