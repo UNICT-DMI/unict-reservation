@@ -91,6 +91,34 @@ pub async fn handler(
                 }
             }
         },
+        "timetable" => unsafe {
+            match browser::select_table_row(call[2]).await {
+                Ok(result) => {
+                    if result {
+                        cx.requester
+                            .edit_message_text(
+                                chat_id.to_string(),
+                                cx.update.message.clone().unwrap().id,
+                                "Reservation made! ✅",
+                            )
+                            .await?;
+                        return Ok(true);
+                    } else {
+                        cx.requester
+                            .edit_message_text(
+                                chat_id.to_string(),
+                                cx.update.message.clone().unwrap().id,
+                                "Error, try again! ⚠️",
+                            )
+                            .await?;
+                        return Ok(false);
+                    }
+                }
+                Err(_) => {
+                    return Ok(false);
+                }
+            }
+        },
         _ => Ok(false),
     }
 }

@@ -188,6 +188,27 @@ impl Browser {
 
         Ok(None)
     }
+
+    // Select the row for the timetable booking
+    pub async unsafe fn select_timetable_row(&self, index: &str) -> WebDriverResult<bool> {
+        if let Some(_d) = &self.driver {
+            _d.find_element(By::Css(
+                &format!("#slotContainerTable tr:nth-child({}) td", index).to_owned()[..],
+            ))
+            .await?
+            .click()
+            .await?;
+            thread::sleep(time::Duration::from_millis(2000));
+            _d.find_element(By::Css("#partialQuestionYesNoConfirmButton:last-child"))
+                .await?
+                .click()
+                .await?;
+
+            return Ok(true);
+        }
+
+        Ok(false)
+    }
 }
 
 /// The static unsafe variable used to open a web browser

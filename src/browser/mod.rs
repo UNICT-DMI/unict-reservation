@@ -72,3 +72,13 @@ pub async unsafe fn get_timetable() -> WebDriverResult<Option<HashMap<String, St
 
     Ok(None)
 }
+
+pub async unsafe fn select_table_row(index: &str) -> WebDriverResult<bool> {
+    if let Some(driver) = &WEB_BROWSER {
+        let result = driver.select_timetable_row(index).await?;
+
+        return Ok(result);
+    }
+
+    Ok(false)
+}
