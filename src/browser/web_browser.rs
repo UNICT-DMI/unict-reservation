@@ -113,16 +113,16 @@ impl Browser {
                 ))
                 .await?;
 
-            let mut faculties_ids = HashMap::<String, String>::new();
+            let mut options = HashMap::<String, String>::new();
 
             for i in list_elements {
-                faculties_ids.insert(
+                options.insert(
                     i.get_attribute("data-select2-id").await.unwrap().unwrap(),
                     i.text().await.unwrap(),
                 );
             }
 
-            return Ok(Some(faculties_ids));
+            return Ok(Some(options));
         }
 
         Ok(None)
