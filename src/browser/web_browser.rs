@@ -28,6 +28,7 @@ impl Browser {
 
         let mut caps = FirefoxCapabilities::new();
         let _ = caps.set_preferences(prefs);
+        let _ = caps.set_headless();
 
         Self {
             driver: Some(WebDriver::new(driver_url, caps).await.unwrap()),
