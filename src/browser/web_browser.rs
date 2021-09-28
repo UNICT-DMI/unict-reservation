@@ -7,7 +7,7 @@ use thirtyfour::prelude::{By, WebDriverResult};
 use thirtyfour::{FirefoxCapabilities, WebDriver, WebDriverCommands, WebElement};
 
 /// This url is used to make the login
-const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx?ReturnUrl=%2fStudenti%2fDefault.aspx";
+const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/Logon.aspx";
 /// This url is used to go to the page where a student can book a room for study
 pub const ROOMS_URL: &str = "https://studenti.smartedu.unict.it/StudentSpaceReserv?Type=unaTantum";
 
@@ -66,7 +66,7 @@ impl Browser {
 
             // If the current url is the same as `LOGIN_URL` it means the login didn't work, so
             // returns a "login error"
-            if _d.current_url().await? == LOGIN_URL {
+            if _d.current_url().await?.starts_with(LOGIN_URL) {
                 return Err(WebDriverError::SessionNotCreated(WebDriverErrorInfo {
                     status: 400,
                     error: "SessionNotCreated".to_string(),
