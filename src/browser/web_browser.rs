@@ -53,20 +53,46 @@ impl Browser {
     //     Ok(())
     // }
 
+    /// Compare `current_url` with the login path. If they are the same, it
+    /// needs to re-login
+    async unsafe fn check_login(&self) -> WebDriverResult<bool> {
+        if let Some(_d) = &self.driver {
+            if !_d.current_url().await?.starts_with(LOGIN_URL) {
+                return Ok(false);
+            }
+
+            log::debug!("Logging...");
+            match self._login().await {
+                Ok(_) => {
+                    log::info!("Logged in Smartedu!");
+                }
+                Err(e) => {
+                    // Using the bot when the user is not logged in, is simply useless.
+                    panic!(
+                        "You can't connect: `{}`, credentials are {:?}",
+                        e, self.credentials
+                    );
+                }
+            };
+        }
+
+        Ok(true)
+    }
+
     /// Login on `LOGIN_URL`
-    pub async unsafe fn _login(&self, credentials: &Config) -> WebDriverResult<()> {
+    async unsafe fn _login(&self) -> WebDriverResult<()> {
         if let Some(_d) = &self.driver {
             _d.get(LOGIN_URL).await?;
 
             let cf_input = _d.find_element(By::Name("ctl01$contents$UserName")).await?;
-            cf_input.send_keys(&credentials.cf).await?;
+            cf_input.send_keys(&self.credentials.cf).await?;
 
             thread::sleep(time::Duration::from_millis(3000));
 
             let psw_input = _d
                 .find_element(By::Name("ctl01$contents$UserPassword"))
                 .await?;
-            psw_input.send_keys(&credentials.password).await?;
+            psw_input.send_keys(&self.credentials.password).await?;
 
             thread::sleep(time::Duration::from_millis(3000));
 
@@ -107,6 +133,19 @@ impl Browser {
         if let Some(_d) = &self.driver {
             if url != "" {
                 _d.get(url).await?;
+            }
+
+            unsafe {
+                match self.check_login().await {
+                    Ok(true) => {
+                        // Login has been made, so reload the url
+                        if url != "" {
+                            _d.get(url).await?;
+                        }
+                    }
+                    Ok(false) => {}
+                    Err(e) => panic!("{:?}", e),
+                };
             }
             thread::sleep(time::Duration::from_millis(1000));
 

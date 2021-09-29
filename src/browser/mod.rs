@@ -14,16 +14,6 @@ pub async fn init(config: &Config) {
     }
 }
 
-/// Login using the credentials from the `Config`. 'Cause its kind of nature
-/// this is an `unsafe` block, so the function is defined like that
-pub async unsafe fn login(credentials: &Config) -> WebDriverResult<()> {
-    if let Some(driver) = &WEB_BROWSER {
-        driver._login(credentials).await?;
-    }
-
-    Ok(())
-}
-
 /// Get the faculties available for booking a room
 pub async unsafe fn get_faculties() -> WebDriverResult<Option<HashMap<String, String>>> {
     if let Some(driver) = &WEB_BROWSER {
