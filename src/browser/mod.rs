@@ -8,9 +8,9 @@ mod web_browser;
 
 /// Create a new instance of `Browser` and associate it with the static variable `WEB_BROWSER`.
 /// This is an unsecure type of usage, so the block is inside the `unsafe` block
-pub async fn init(driver_url: &String) {
+pub async fn init(config: &Config) {
     unsafe {
-        WEB_BROWSER = Some(Browser::new(driver_url).await);
+        WEB_BROWSER = Some(Browser::new(config).await);
     }
 }
 

@@ -11,15 +11,22 @@ const LOGIN_URL: &str = "https://studenti.smartedu.unict.it/WorkFlow2011/Logon/L
 /// This url is used to go to the page where a student can book a room for study
 pub const ROOMS_URL: &str = "https://studenti.smartedu.unict.it/StudentSpaceReserv?Type=unaTantum";
 
+#[derive(Debug)]
+struct Credentials {
+    cf: String,
+    password: String,
+}
+
 /// Browser struct
 pub struct Browser {
     /// The driver for Firefox, it could be `None`
     driver: Option<WebDriver>,
+    credentials: Credentials,
 }
 
 impl Browser {
     /// Create a new `Browser` with a Firefox driver with a personalized User-Agent
-    pub async fn new(driver_url: &String) -> Self {
+    pub async fn new(config: &Config) -> Self {
         let user_agent =
             "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0";
 
@@ -30,8 +37,14 @@ impl Browser {
         let _ = caps.set_preferences(prefs);
         let _ = caps.set_headless();
 
+        let credentials = Credentials {
+            cf: config.cf.clone(),
+            password: config.password.clone(),
+        };
+
         Self {
-            driver: Some(WebDriver::new(driver_url, caps).await.unwrap()),
+            driver: Some(WebDriver::new(&config.driver_url, caps).await.unwrap()),
+            credentials,
         }
     }
 

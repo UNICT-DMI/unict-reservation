@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     unsafe {
         // Open the browser
-        browser::init(&config.driver_url).await;
+        browser::init(&config).await;
 
         // Login using the credentials inside the `config`
         match browser::login(&config).await {
